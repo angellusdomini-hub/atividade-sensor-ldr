@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Atividade prática de montagem de um sensor LDR com Arduino UNO, LED vermelho e programação no mBlock.">
+  <title>Atividade Sensor LDR | Escola Universitas</title>
+  <style>
+    :root {
+      --blue: #087fc4;
+      --navy: #17324d;
+      --teal: #0b8f87;
+      --orange: #f39c12;
+      --red: #c0392b;
+      --ink: #263746;
+      --muted: #647484;
+      --line: #d7e0e8;
+      --paper: #ffffff;
+      --wash: #f4f8fb;
+      --blue-wash: #eaf5fc;
+      --teal-wash: #eaf8f6;
+      --orange-wash: #fff5e3;
+      --red-wash: #fdecea;
+      --shadow: 0 16px 40px rgba(23, 50, 77, .12);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--wash);
+      color: var(--ink);
+      font: 16px/1.6 Arial, Helvetica, sans-serif;
+    }
+    img { max-width: 100%; height: auto; display: block; }
+    a { color: inherit; }
+    button { font: inherit; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255, 255, 255, .96);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+    }
+    .nav {
+      width: min(1120px, calc(100% - 32px));
+      margin: auto;
+      min-height: 66px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+    .brand { color: var(--navy); font-weight: 800; letter-spacing: .02em; }
+    .brand span { color: var(--blue); }
+    .nav-links { display: flex; flex-wrap: wrap; gap: 4px; }
+    .nav-links a {
+      padding: 8px 10px;
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--muted);
+      font-size: .9rem;
+      font-weight: 700;
+    }
+    .nav-links a:hover, .nav-links a:focus { background: var(--blue-wash); color: var(--blue); }
+
+    .hero {
+      background:
+        radial-gradient(circle at 86% 18%, rgba(11,143,135,.18), transparent 27%),
+        linear-gradient(135deg, #0a78b6, #17436c);
+      color: white;
+      padding: 72px 0 64px;
+    }
+    .hero-inner, main, footer > div { width: min(1040px, calc(100% - 32px)); margin: auto; }
+    .eyebrow { text-transform: uppercase; letter-spacing: .14em; font-weight: 800; font-size: .82rem; color: #bfeeff; }
+    h1 { margin: 10px 0 16px; max-width: 850px; font-size: clamp(2.25rem, 6vw, 4.7rem); line-height: 1.03; letter-spacing: -.045em; }
+    .lead { max-width: 740px; margin: 0; font-size: clamp(1.05rem, 2.2vw, 1.3rem); color: #eaf7ff; }
+    .hero-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+    .pill { padding: 7px 12px; border: 1px solid rgba(255,255,255,.34); border-radius: 999px; background: rgba(255,255,255,.1); font-size: .9rem; font-weight: 700; }
+
+    main { padding: 44px 0 72px; }
+    section { scroll-margin-top: 86px; margin-bottom: 46px; }
+    .card { background: var(--paper); border: 1px solid var(--line); border-radius: 18px; padding: clamp(22px, 4vw, 38px); box-shadow: var(--shadow); }
+    h2 { margin: 0 0 18px; color: var(--navy); font-size: clamp(1.65rem, 4vw, 2.35rem); line-height: 1.15; }
+    h3 { margin: 0 0 8px; color: var(--navy); font-size: 1.16rem; }
+    p { margin: 0 0 14px; }
+    .section-intro { color: var(--muted); max-width: 800px; }
+
+    .materials { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-top: 24px; }
+    .material { border: 1px solid var(--line); border-radius: 13px; padding: 15px; background: #fff; }
+    .material b { display: block; color: var(--blue); font-size: .82rem; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 3px; }
+
+    .callout { border: 1px solid var(--blue); border-left-width: 6px; border-radius: 10px; padding: 15px 17px; background: var(--blue-wash); margin: 20px 0; }
+    .callout strong { display: block; color: var(--navy); margin-bottom: 2px; }
+    .callout.warning { border-color: var(--orange); background: var(--orange-wash); }
+    .callout.danger { border-color: var(--red); background: var(--red-wash); }
+    .callout.test { border-color: var(--teal); background: var(--teal-wash); }
+
+    figure { margin: 24px 0 0; }
+    figure img { width: 100%; border: 1px solid var(--line); border-radius: 13px; background: white; }
+    figcaption { margin-top: 9px; color: var(--muted); text-align: center; font-size: .88rem; }
+
+    .steps { display: grid; gap: 15px; margin-top: 24px; counter-reset: step; }
+    .step { position: relative; padding: 20px 20px 20px 74px; border: 1px solid var(--line); border-radius: 14px; background: #fff; }
+    .step::before {
+      counter-increment: step;
+      content: counter(step);
+      position: absolute;
+      left: 18px;
+      top: 18px;
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--blue);
+      color: white;
+      font-weight: 800;
+    }
+    .step p:last-child { margin-bottom: 0; }
+
+    .table-wrap { overflow-x: auto; margin: 18px 0 24px; border-radius: 12px; border: 1px solid var(--line); }
+    table { width: 100%; border-collapse: collapse; min-width: 620px; background: white; }
+    th { background: var(--navy); color: white; text-align: left; }
+    th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    tr:last-child td { border-bottom: 0; }
+    tbody tr:nth-child(even) { background: #f8fafb; }
+
+    .code-layout { display: grid; grid-template-columns: minmax(280px, .9fr) minmax(300px, 1.1fr); gap: 28px; align-items: start; }
+    .code-layout figure { margin: 0; position: sticky; top: 92px; }
+    .code-layout .steps { margin-top: 0; }
+
+    .test-box { padding: 24px; border-radius: 16px; background: linear-gradient(135deg, #eaf8f6, #f7fffd); border: 2px solid var(--teal); }
+    .test-box h3 { color: #086f69; }
+    .test-sequence { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 18px 0 8px; }
+    .test-sequence div { background: white; border: 1px solid #b9dedb; border-radius: 12px; padding: 14px; text-align: center; font-weight: 700; }
+    .test-sequence span { display: block; color: var(--teal); font-size: 1.3rem; margin-bottom: 4px; }
+
+    .checklist { list-style: none; padding: 0; margin: 20px 0 0; display: grid; gap: 9px; }
+    .checklist li { padding: 12px 14px 12px 46px; background: var(--teal-wash); border: 1px solid #cce8e5; border-radius: 10px; position: relative; }
+    .checklist li::before { content: "□"; position: absolute; left: 16px; top: 7px; font-size: 1.55rem; color: var(--teal); }
+
+    footer { background: var(--navy); color: #dce8f1; padding: 28px 0; }
+    footer p { margin: 0; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+    .button { border: 0; border-radius: 10px; padding: 11px 16px; font-weight: 800; cursor: pointer; background: var(--blue); color: white; }
+    .button.secondary { background: white; color: var(--navy); border: 1px solid var(--line); }
+
+    @media (max-width: 800px) {
+      .nav-links { display: none; }
+      .hero { padding: 52px 0 48px; }
+      .code-layout { grid-template-columns: 1fr; }
+      .code-layout figure { position: static; }
+      .test-sequence { grid-template-columns: 1fr; }
+    }
+
+    @media print {
+      body { background: white; font-size: 11pt; }
+      .topbar, .actions { display: none; }
+      .hero { background: white; color: var(--navy); padding: 25px 0; border-bottom: 4px solid var(--blue); }
+      .eyebrow, .lead { color: var(--navy); }
+      .pill { border-color: var(--line); background: white; }
+      main { padding: 24px 0; }
+      .card { box-shadow: none; break-inside: avoid; }
+      .code-layout { grid-template-columns: 1fr 1fr; }
+      .code-layout figure { position: static; }
+      section { break-inside: avoid; margin-bottom: 22px; }
+      footer { background: white; color: var(--muted); border-top: 1px solid var(--line); }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <nav class="nav" aria-label="Navegação principal">
+      <div class="brand">Escola <span>Universitas</span></div>
+      <div class="nav-links">
+        <a href="#materiais">Materiais</a>
+        <a href="#montagem">Montagem</a>
+        <a href="#programacao">Programação</a>
+        <a href="#teste">Teste</a>
+        <a href="#checklist">Checklist</a>
+      </div>
+    </nav>
+  </header>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="eyebrow">Robótica iniciante</div>
+      <h1>Sensor de luminosidade com Arduino e mBlock</h1>
+      <p class="lead">Monte um circuito que percebe a mudança de luz e controla um LED vermelho automaticamente.</p>
+      <div class="hero-meta">
+        <span class="pill">Arduino UNO R3</span>
+        <span class="pill">Módulo LDR</span>
+        <span class="pill">Entrada e saída digital</span>
+        <span class="pill">1 aula prática</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="materiais" class="card">
+      <h2>1. Separe os materiais</h2>
+      <p class="section-intro">O objetivo é compreender como o Arduino recebe o sinal do sensor e toma uma decisão para ligar ou desligar o LED.</p>
+      <div class="materials">
+        <div class="material"><b>1 unidade</b>Placa Arduino UNO R3</div>
+        <div class="material"><b>1 unidade</b>Cabo USB</div>
+        <div class="material"><b>1 unidade</b>Protoboard de 400 pontos</div>
+        <div class="material"><b>5 unidades</b>Jumpers macho-macho</div>
+        <div class="material"><b>1 unidade</b>Módulo sensor LDR</div>
+        <div class="material"><b>1 unidade</b>LED vermelho de 5 mm</div>
+        <div class="material"><b>1 unidade</b>Resistor de 220 ohms</div>
+      </div>
+      <div class="callout danger"><strong>Segurança</strong>Deixe o cabo USB desconectado durante a montagem. Nunca ligue 5V diretamente ao GND e nunca use o LED sem o resistor.</div>
+    </section>
+
+    <section id="montagem" class="card">
+      <h2>2. Monte o circuito</h2>
+      <p class="section-intro">A imagem apresenta a montagem geral. Para que toda a turma tenha a mesma referência, siga as coordenadas indicadas abaixo.</p>
+      <figure>
+        <img src="assets/montagem-arduino-ldr.png" alt="Montagem de Arduino UNO, módulo LDR, resistor e LED vermelho em uma protoboard">
+        <figcaption>Referência visual da ligação do módulo LDR, do Arduino e do LED.</figcaption>
+      </figure>
+
+      <div class="callout"><strong>Como ler a protoboard</strong>Os cinco furos A-E de uma mesma linha numérica são conectados entre si. Os furos F-J formam outro grupo, separado pela canaleta central.</div>
+
+      <div class="steps">
+        <article class="step"><h3>Desligue o Arduino</h3><p>Retire o cabo USB antes de posicionar ou alterar qualquer componente.</p></article>
+        <article class="step"><h3>Posicione o módulo LDR</h3><p>Com o sensor voltado para cima, encaixe os três pinos nas posições <strong>F5, F6 e F7</strong>. Use as inscrições do próprio módulo para reconhecer DO/S, GND e VCC.</p></article>
+        <article class="step"><h3>Faça as ligações do sensor</h3><p>Ligue <strong>J5 ao A0</strong>, <strong>J6 ao GND</strong> e <strong>J7 ao 5V</strong>, respeitando a função indicada no módulo.</p></article>
+        <article class="step"><h3>Posicione o LED vermelho</h3><p>Coloque a perna longa, o ânodo, em <strong>E29</strong>. Coloque a perna curta, o cátodo, em <strong>E30</strong>. O lado achatado do LED também marca o cátodo.</p></article>
+        <article class="step"><h3>Instale o resistor</h3><p>Encaixe o resistor de 220 ohms entre <strong>A25 e A29</strong>. O resistor não possui polaridade.</p></article>
+        <article class="step"><h3>Conecte o LED</h3><p>Ligue um jumper de <strong>E25 até D7</strong> e outro de <strong>A30 até GND</strong>.</p></article>
+      </div>
+
+      <div class="callout warning"><strong>A ordem dos pinos pode variar</strong>Alguns módulos LDR não apresentam os pinos na ordem DO-GND-VCC. Siga sempre os nomes impressos no seu componente, não apenas a posição mostrada na imagem.</div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Ligação</th><th>Origem</th><th>Destino</th><th>Função</th></tr></thead>
+          <tbody>
+            <tr><td>Jumper 1</td><td>J5</td><td>Arduino A0</td><td>Sinal do LDR</td></tr>
+            <tr><td>Jumper 2</td><td>J6</td><td>Arduino GND</td><td>Terra do sensor</td></tr>
+            <tr><td>Jumper 3</td><td>J7</td><td>Arduino 5V</td><td>Alimentação do sensor</td></tr>
+            <tr><td>Jumper 4</td><td>E25</td><td>Arduino D7</td><td>Comando do LED</td></tr>
+            <tr><td>Jumper 5</td><td>A30</td><td>Arduino GND</td><td>Retorno do LED</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout test"><strong>Caminho da corrente</strong>D7 → E25/A25 → resistor → A29/E29 → LED → E30/A30 → GND.</div>
+    </section>
+
+    <section id="programacao" class="card">
+      <h2>3. Programe no mBlock</h2>
+      <p class="section-intro">Depois de conferir a montagem, conecte o Arduino pelo cabo USB, adicione o dispositivo Arduino Uno e escolha a porta correta.</p>
+      <div class="code-layout">
+        <figure>
+          <img src="assets/programacao-mblock.png" alt="Blocos do mBlock para ler o sensor LDR e controlar o LED">
+          <figcaption>Modelo de programação em blocos.</figcaption>
+        </figure>
+        <div>
+          <div class="steps">
+            <article class="step"><h3>Crie a variável</h3><p>Crie uma variável chamada <strong>Sensor_LDR</strong>.</p></article>
+            <article class="step"><h3>Inicie o programa</h3><p>Adicione o bloco <strong>quando o Arduino Uno começar</strong>.</p></article>
+            <article class="step"><h3>Repita sempre</h3><p>Insira o bloco <strong>repetir para sempre</strong>.</p></article>
+            <article class="step"><h3>Leia o sensor</h3><p>Defina Sensor_LDR para <strong>ler pino digital 14</strong>. No Arduino Uno, o pino 14 corresponde ao <strong>A0</strong>. Se o programa oferecer A0 diretamente, selecione A0.</p></article>
+            <article class="step"><h3>Mostre o valor</h3><p>Escreva <strong>Valor lido:</strong> junto da variável na porta serial e espere <strong>0,1 segundo</strong>.</p></article>
+            <article class="step"><h3>Controle o LED</h3><p>Se Sensor_LDR = 1, defina a saída digital <strong>D7 como alto</strong>. Senão, defina <strong>D7 como baixo</strong>.</p></article>
+          </div>
+        </div>
+      </div>
+      <div class="callout danger"><strong>Correção obrigatória na imagem</strong>A referência mostra o LED no pino 5, mas nesta montagem o jumper está no <strong>D7</strong>. Nos dois blocos azuis, troque o número 5 pelo número <strong>7</strong>.</div>
+    </section>
+
+    <section id="teste" class="card">
+      <h2>4. Envie, teste e ajuste</h2>
+      <div class="test-box">
+        <h3>Teste principal: apague a luz da sala</h3>
+        <p>Depois de enviar o programa ao Arduino, faça o teste em três momentos e observe tanto o LED quanto o valor mostrado no monitor serial.</p>
+        <div class="test-sequence">
+          <div><span>1</span>Com a luz acesa, anote o valor.</div>
+          <div><span>2</span>Apague a luz da sala e observe a mudança.</div>
+          <div><span>3</span>Acenda a luz novamente e compare.</div>
+        </div>
+        <p><strong>Se a sala não ficar escura:</strong> cubra o LDR completamente com a mão ou com um pedaço de papel opaco.</p>
+      </div>
+
+      <div class="steps">
+        <article class="step"><h3>Faça a última conferência</h3><p>Verifique VCC em 5V, GND em GND, DO/S em A0 e o LED em D7 com o resistor.</p></article>
+        <article class="step"><h3>Envie o programa</h3><p>Selecione a porta do Arduino e aguarde a confirmação do mBlock.</p></article>
+        <article class="step"><h3>Abra o monitor serial</h3><p>Confira se o valor muda entre 0 e 1 quando a iluminação muda.</p></article>
+        <article class="step"><h3>Ajuste a sensibilidade</h3><p>Gire lentamente o pequeno potenciômetro azul do módulo até a mudança acontecer no ponto desejado.</p></article>
+        <article class="step"><h3>Confira o comportamento</h3><p>Se o LED responder de forma invertida, troque alto por baixo e baixo por alto no bloco se/senão.</p></article>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Sintoma</th><th>O que conferir</th></tr></thead>
+          <tbody>
+            <tr><td>LED não acende</td><td>Polaridade do LED, resistor, jumper em D7 e blocos configurados para o pino 7.</td></tr>
+            <tr><td>LED fica sempre aceso</td><td>Potenciômetro do módulo e mudança do valor no monitor serial.</td></tr>
+            <tr><td>Leitura não muda</td><td>DO/S em A0, leitura no pino 14/A0, VCC e GND.</td></tr>
+            <tr><td>Arduino não conecta</td><td>Cabo USB, porta selecionada e dispositivo Arduino Uno.</td></tr>
+            <tr><td>Circuito aquece</td><td>Desconecte imediatamente o USB e procure uma ligação direta entre 5V e GND.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="checklist" class="card">
+      <h2>5. Checklist de entrega</h2>
+      <ul class="checklist">
+        <li>O circuito possui exatamente 5 jumpers macho-macho.</li>
+        <li>O LED vermelho está protegido pelo resistor de 220 ohms.</li>
+        <li>O sensor está sendo lido pelo A0, correspondente ao pino digital 14 no bloco.</li>
+        <li>O LED está ligado e programado no pino digital 7.</li>
+        <li>O grupo apagou a luz da sala e comparou os valores com a luz acesa.</li>
+        <li>O monitor serial mostra mudança quando a luminosidade varia.</li>
+        <li>O grupo consegue explicar o papel do sensor, do Arduino e do LED.</li>
+      </ul>
+      <div class="actions">
+        <button class="button" type="button" onclick="window.print()">Imprimir atividade</button>
+        <a class="button secondary" href="#materiais">Voltar ao início</a>
+      </div>
+    </section>
+  </main>
+
+  <footer><div><p><strong>Escola Universitas</strong> · Atividade de Robótica Iniciante · Sensor LDR</p></div></footer>
+</body>
+</html>
